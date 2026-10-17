@@ -1,0 +1,4 @@
+package me.mioclient.baritone.api.selection;
+public interface ISelectionManager {
+   ISelection getLastSelection();
+}

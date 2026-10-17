@@ -1,0 +1,24 @@
+package me.mioclient.mixin.ducks;
+
+import net.minecraft.client.Minecraft;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.gen.Accessor;
+import org.spongepowered.asm.mixin.gen.Invoker;
+
+@Mixin({Minecraft.class})
+public interface DuckMinecraftClient {
+   @Invoker("startAttack")
+   boolean attack();
+
+   @Invoker("startUseItem")
+   void interact();
+
+   @Accessor("rightClickDelay")
+   void setItemUseCooldown(int var1);
+
+   @Accessor("rightClickDelay")
+   int getItemUseCooldown();
+
+   @Accessor("clientLevelTeardownInProgress")
+   boolean mio$isDisconnecting();
+}

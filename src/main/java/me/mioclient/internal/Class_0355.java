@@ -1,0 +1,313 @@
+package me.mioclient.internal;
+
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.builder.RequiredArgumentBuilder;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+import java.util.List;
+import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import me.mioclient.Hub;
+import me.mioclient.deobf.Named;
+import me.mioclient.enum_.Class_0836;
+import me.mioclient.enum_.Priority;
+import me.mioclient.module.Category;
+import me.mioclient.module.Module;
+import me.mioclient.module.abstract_.AbstractModule_26;
+import me.mioclient.record.JsonProfile;
+import me.mioclient.record.Keybind;
+import net.minecraft.ChatFormatting;
+import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentUtils;
+import net.minecraft.network.chat.MutableComponent;
+
+public final class Class_0355 extends ChatCommand {
+   public Class_0355() {
+      super("preset");
+      this.method_9("config", "cfg");
+   }
+
+   @Override
+   public void exec(LiteralArgumentBuilder<SharedSuggestionProvider> var1) {
+      ((LiteralArgumentBuilder<SharedSuggestionProvider>)((LiteralArgumentBuilder<SharedSuggestionProvider>)var1.then(
+               RequiredArgumentBuilder.<SharedSuggestionProvider, Class_0836>argument(
+                                    "category", new Class_0798()
+                                 )
+                                 .then(
+                                    LiteralArgumentBuilder.<SharedSuggestionProvider>literal("save")
+                                       .then(
+                                          RequiredArgumentBuilder.<SharedSuggestionProvider, String>argument("preset", StringArgumentType.string())
+                                             .executes(
+                                                var0 -> {
+                                                   String var1x = (String)var0.getArgument("preset", String.class);
+                                                   JsonProfileRegistry var2 = Class_0798.getManager(var0, "category");
+
+                                                   try {
+                                                      var2.method_494(var1x);
+                                                   } catch (IOException var4) {
+                                                      var4.printStackTrace();
+                                                   }
+
+                                                   ChatUtil.method_2(
+                                                      Component.literal(new PlaceholderText().method_2((Object)var1x).method_9("Preset \u0001 has been saved.")),
+                                                      ChatUtil.method_38(-1)
+                                                   );
+                                                   return 1;
+                                                }
+                                             )
+                                       )
+                                 ))
+                              .then(
+                                 LiteralArgumentBuilder.<SharedSuggestionProvider>literal("delete")
+                                    .then(
+                                       RequiredArgumentBuilder.<SharedSuggestionProvider, String>argument("preset", new Class_0897())
+                                          .executes(
+                                             var0 -> {
+                                                JsonProfile var1x = Class_0897.getPreset(var0, "category", "preset");
+                                                JsonProfileRegistry var2 = Class_0798.getManager(var0, "category");
+                                                var2.method_493(var1x.method_228());
+                                                ChatUtil.method_2(
+                                                   Component.literal(new PlaceholderText().method_2(var1x.method_228()).method_9("Preset \u0001 has been deleted.")),
+                                                   ChatUtil.method_38(-1)
+                                                );
+                                                return 1;
+                                             }
+                                          )
+                                    )
+                              ))
+                           .then(
+                              LiteralArgumentBuilder.<SharedSuggestionProvider>literal("rename")
+                                 .then(
+                                    RequiredArgumentBuilder.<SharedSuggestionProvider, String>argument("preset", new Class_0897())
+                                       .then(
+                                          RequiredArgumentBuilder.<SharedSuggestionProvider, String>argument("name", StringArgumentType.string())
+                                             .executes(
+                                                var0 -> {
+                                                   JsonProfile var1x = Class_0897.getPreset(var0, "category", "preset");
+                                                   JsonProfileRegistry var2 = Class_0798.getManager(var0, "category");
+                                                   var2.method_39(var1x.method_228(), (String)var0.getArgument("name", String.class));
+                                                   ChatUtil.method_2(
+                                                      Component.literal(
+                                                         new PlaceholderText()
+                                                            .method_2((String)var0.getArgument("name", String.class))
+                                                            .method_2(var1x.method_228())
+                                                            .method_9("The name of \u0001 has been set to \u0001.")
+                                                      ),
+                                                      ChatUtil.method_38(-1)
+                                                   );
+                                                   return 1;
+                                                }
+                                             )
+                                       )
+                                 )
+                           ))
+                        .then(
+                           LiteralArgumentBuilder.<SharedSuggestionProvider>literal("load")
+                              .then(
+                                 RequiredArgumentBuilder.<SharedSuggestionProvider, String>argument("preset", new Class_0897())
+                                    .executes(
+                                       var1x -> {
+                                          Hub.field_2597.method_1174().method_357();
+                                          Class_0836 var2 = (Class_0836)var1x.getArgument("category", Class_0836.class);
+                                          JsonProfile var3 = Class_0897.getPreset(var1x, "category", "preset");
+                                          JsonProfileRegistry var4 = Class_0798.getManager(var1x, "category");
+                                          var4.method_56();
+                                          var4.method_465(var3.method_228());
+                                          ChatUtil.method_2(
+                                             Component.literal(new PlaceholderText().method_2(var3.method_228()).method_9("Preset \u0001 has been loaded.")),
+                                             ChatUtil.method_38(-1)
+                                          );
+                                          if (var2 == Class_0836.ALL) {
+                                             this.method_2(this::method_393);
+                                          }
+
+                                          return 1;
+                                       }
+                                    )
+                              )
+                        )
+                     .then(
+                        LiteralArgumentBuilder.<SharedSuggestionProvider>literal("specific")
+                           .then(
+                              (RequiredArgumentBuilder.<SharedSuggestionProvider, String>argument("preset", new Class_0897())
+                                    .then(
+                                       RequiredArgumentBuilder.<SharedSuggestionProvider, Category>argument("module_category", new EnumArgumentType<Category>(Category.class, "Category"))
+                                          .executes(
+                                             var1x -> {
+                                                Hub.field_2597.method_1174().method_357();
+                                                JsonProfile var2 = Class_0897.getPreset(var1x, "category", "preset");
+                                                JsonProfileRegistry var3 = Class_0798.getManager(var1x, "category");
+                                                Category var4 = (Category)var1x.getArgument("module_category", Category.class);
+                                                var3.method_56();
+                                                this.method_2(var2, var1xx -> var1xx.getCategory() == var4);
+                                                ChatUtil.method_2(
+                                                   Component.literal(
+                                                      new PlaceholderText()
+                                                         .method_2(var4.getName())
+                                                         .method_2(var2.method_228())
+                                                         .method_9("Preset \u0001 for \u0001 has been loaded.")
+                                                   ),
+                                                   ChatUtil.method_38(-1)
+                                                );
+                                                return 1;
+                                             }
+                                          )
+                                    ))
+                                 .then(
+                                    RequiredArgumentBuilder.argument("modules", new Class_0232(new ModuleArgumentType()))
+                                       .executes(
+                                          var1x -> {
+                                             Hub.field_2597.method_1174().method_357();
+                                             JsonProfile var2 = Class_0897.getPreset(var1x, "category", "preset");
+                                             JsonProfileRegistry var3 = Class_0798.getManager(var1x, "category");
+                                             Set<Class<?>> var4 = ((List<?>)var1x.getArgument("modules", List.class))
+                                                .stream()
+                                                .map(Object::getClass)
+                                                .collect(Collectors.toSet());
+                                             var3.method_56();
+                                             Predicate var5 = var1xx -> var4.contains(var1xx.getClass());
+                                             this.method_2(var2, var5);
+                                             ChatUtil.method_2(
+                                                Component.literal(
+                                                   new PlaceholderText()
+                                                      .method_2(this.method_4(var5))
+                                                      .method_2(var2.method_228())
+                                                      .method_9("Preset \u0001 for \u0001 has been loaded.")
+                                                ),
+                                                ChatUtil.method_38(-1)
+                                             );
+                                             return 1;
+                                          }
+                                       )
+                                 )
+                           )
+                     )
+                  .then(
+                     LiteralArgumentBuilder.<SharedSuggestionProvider>literal("list")
+                        .executes(
+                           var0 -> {
+                              JsonProfileRegistry var1x = Class_0798.getManager(var0, "category");
+                              ChatUtil.method_2(
+                                 Component.literal("Preset list: ").append(ComponentUtils.formatList(var1x.getRegistry(), var0x -> Component.literal(var0x.method_228()))).append("."),
+                                 ChatUtil.method_38(-1)
+                              );
+                              return 1;
+                           }
+                        )
+                  )
+            .then(
+               LiteralArgumentBuilder.<SharedSuggestionProvider>literal("export")
+                  .then(
+                     RequiredArgumentBuilder.<SharedSuggestionProvider, Module>argument("module", new ModuleArgumentType())
+                        .executes(
+                           var0 -> {
+                              Module var1x = (Module)var0.getArgument("module", Module.class);
+                              JsonObject var2 = var1x.toJson().getAsJsonObject();
+                              var2.remove("bind");
+                              var2.remove("toggled");
+                              var2.remove("key");
+                              mc.keyboardHandler.setClipboard(Base64.getEncoder().encodeToString(var2.toString().getBytes(StandardCharsets.UTF_8)));
+                              ChatUtil.method_2(
+                                 Component.literal("Successfully copied ")
+                                    .append(Component.literal(var1x.getName()).withStyle(ChatFormatting.GRAY))
+                                    .append(" config to your clipboard"),
+                                 ChatUtil.method_38(-1)
+                              );
+                              return 1;
+                           }
+                        )
+                  )
+            )
+         .then(
+            LiteralArgumentBuilder.<SharedSuggestionProvider>literal("import")
+               .then(
+                  RequiredArgumentBuilder.<SharedSuggestionProvider, Module>argument("module", new ModuleArgumentType())
+                     .executes(
+                        var0 -> {
+                           Module var1x = (Module)var0.getArgument("module", Module.class);
+
+                           try {
+                              String var2 = new String(Base64.getDecoder().decode(mc.keyboardHandler.getClipboard().trim().replace("\n", "")));
+                              var1x.fromJson(JsonParser.parseString(var2));
+                              ChatUtil.method_2(
+                                 Component.literal("Successfully loaded ")
+                                    .append(Component.literal(var1x.getName()).withStyle(ChatFormatting.GRAY))
+                                    .append(" config from your clipboard"),
+                                 ChatUtil.method_38(-1)
+                              );
+                           } catch (Exception var4) {
+                              MutableComponent var3 = Component.literal("Failed to load ")
+                                 .append(Component.literal(var1x.getName()).withStyle(ChatFormatting.GRAY))
+                                 .append(" config");
+                              if (var4.getStackTrace()[0].toString().contains("Base64")) {
+                                 var3 = var3.append(" due to invalid input");
+                              } else {
+                                 var3 = var3.append(" due to an unknown reason");
+                              }
+
+                              ChatUtil.method_2(var3, ChatUtil.method_38(-1), Priority.MID);
+                              var4.printStackTrace();
+                           }
+
+                           return 1;
+                        }
+                     )
+               )
+         );
+      var1.then(LiteralArgumentBuilder.<SharedSuggestionProvider>literal("restore").executes(var0 -> {
+         JsonElement var1x = Hub.field_2597.method_1174().method_358();
+         if (var1x == null) {
+            return 1;
+         } else {
+            Class_0836.ALL.fromJson(var1x);
+            ChatUtil.method_2(Component.literal("Restored previous preset."), ChatUtil.method_38(-1));
+            return 1;
+         }
+      }));
+      var1.executes(var1x -> {
+         this.method_2(() -> mc.setScreen(new TabbedClickGui()));
+         return 1;
+      });
+   }
+
+   public void method_2(JsonProfile var1, Predicate<Module> var2) {
+      for (Module var4 : (List<me.mioclient.module.Module>)Hub.field_2599.getRegistry()) {
+         if (!(var4 instanceof AbstractModule_26) && var2.test(var4)) {
+            try {
+               var4.fromJson(var1.getJson().getAsJsonObject().get(var4.getConfigName()));
+            } catch (Exception var6) {
+            }
+         }
+      }
+   }
+
+   public String method_4(Predicate<Module> var1) {
+      return ((List<me.mioclient.module.Module>)Hub.field_2599.getRegistry()).stream().filter(var1).map(Named::getName).collect(Collectors.joining(", "));
+   }
+
+   public void method_393() {
+      MutableComponent var1 = Component.empty();
+      var1.append("Preset binds: ");
+
+      for (Module var3 : (List<me.mioclient.module.Module>)Hub.field_2599.getRegistry()) {
+         Keybind var4 = var3.getKeybind();
+         if (!var4.method_29()) {
+            var1.append("\n");
+            var1.append(var3.getName());
+            var1.append(" - ");
+            var1.append(var4.method_4());
+            var1.append(" ");
+            var1.append(ChatUtil.method_185(var4.method_78().getName()));
+         }
+      }
+
+      ChatUtil.method_2(var1, -2);
+   }
+}

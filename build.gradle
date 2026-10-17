@@ -1,0 +1,69 @@
+plugins {
+    id 'net.fabricmc.fabric-loom' version "${loom_version}"
+    id 'java'
+}
+
+group = project.mod_group
+version = project.mod_version
+base { archivesName = project.mod_id }
+
+repositories {
+    maven { url 'https://maven.fabricmc.net/' }
+    maven {
+        // Baritone API
+        url 'https://impactdevelopment.github.io/maven/'
+    }
+    maven {
+        // Sodium
+        url 'https://api.modrinth.com/maven'
+        content { includeGroup "maven.modrinth" }
+    }
+    mavenCentral()
+}
+
+loom {
+    accessWidenerPath = file("src/main/resources/mio.accesswidener")
+
+    runs {
+        client {
+            programArg "--quickPlaySingleplayer"
+            programArg "world"
+        }
+    }
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+
+    implementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+
+    // Sodium — referenced by a couple of mixins and the SodiumBuffer helper.
+    compileOnly "maven.modrinth:sodium:${project.sodium_version}"
+    // Discord-IPC bundled in this jar uses junixsocket for Unix-socket transport.
+    compileOnly "com.kohlschutter.junixsocket:junixsocket-core:2.10.0"
+    compileOnly "net.lenni0451:Reflect:1.5.0"
+
+    // Any other jars dropped in `libs/` are picked up for compilation.
+    compileOnly fileTree(dir: 'libs', includes: ['*.jar'])
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_25
+    targetCompatibility = JavaVersion.VERSION_25
+    withSourcesJar()
+}
+
+processResources {
+    inputs.property "version", project.version
+
+    filesMatching("fabric.mod.json") {
+        expand "version": project.version
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = "UTF-8"
+    options.release = 25
+    options.compilerArgs << '-Xmaxerrs' << '10000'
+}

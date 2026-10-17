@@ -1,0 +1,32 @@
+package me.mioclient.mixin;
+
+import me.mioclient.Hub;
+import net.minecraft.client.DeltaTracker.Timer;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+@Mixin({Timer.class})
+public class MixinRenderTickCounter {
+   @Shadow
+   private float deltaTicks;
+
+   public MixinRenderTickCounter() {
+      super();
+   }
+
+   @Inject(
+      method = {"advanceGameTime(J)I"},
+      at = {@At(
+         value = "FIELD",
+         target = "Lnet/minecraft/client/DeltaTracker$Timer;lastMs:J"
+      )}
+   )
+   public void beginRenderTick(long var1, CallbackInfoReturnable<Integer> var3) {
+      if (Hub.field_2596 != null) {
+         this.deltaTicks = this.deltaTicks * Hub.field_2596.method_537();
+      }
+   }
+}

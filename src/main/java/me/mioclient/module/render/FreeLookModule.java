@@ -1,0 +1,56 @@
+package me.mioclient.module.render;
+
+import me.mioclient.Hub;
+import me.mioclient.event.PostTickEvent;
+import me.mioclient.event.Subscribe;
+import me.mioclient.internal.RenderUtil;
+import me.mioclient.module.Category;
+import me.mioclient.module.Module;
+import me.mioclient.module.player.FreecamModule;
+import net.minecraft.client.CameraType;
+
+public class FreeLookModule extends Module {
+   public static FreecamModule freecam = Hub.field_2595.method_78(FreecamModule.class);
+   public CameraType field_1352;
+
+   public FreeLookModule() {
+      super("FreeLook", "Allows you to rotate your 3rd person camera without rotating your player.", Category.RENDER);
+   }
+
+   @Override
+   public void onEnable() {
+      if (!freecam.isToggled()) {
+         this.field_1352 = mc.options.getCameraType();
+         mc.options.setCameraType(this.method_466());
+      }
+   }
+
+   @Override
+   public void onDisable() {
+      if (this.field_1352 == CameraType.FIRST_PERSON) {
+         mc.options.setCameraType(CameraType.FIRST_PERSON);
+      }
+   }
+
+   @Subscribe(
+      method_800 = -200
+   )
+   public void method_2(PostTickEvent var1) {
+      if (!freecam.isToggled()) {
+         mc.options.setCameraType(this.method_466());
+         mc.hitResult = mc.player.pick(mc.player.blockInteractionRange(), RenderUtil.method_776(), false);
+      }
+   }
+
+   public CameraType method_466() {
+      if (this.field_1352 == CameraType.FIRST_PERSON) {
+         return CameraType.THIRD_PERSON_BACK;
+      } else {
+         if (this.field_1352 == null) {
+            this.field_1352 = CameraType.FIRST_PERSON;
+         }
+
+         return this.field_1352;
+      }
+   }
+}

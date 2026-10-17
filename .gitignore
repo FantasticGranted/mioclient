@@ -1,0 +1,9 @@
+.gradle/
+build/
+*.class
+run/
+*.log
+*.err
+hs_err_pid*
+*.restore
+errors*.json

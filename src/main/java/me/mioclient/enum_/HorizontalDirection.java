@@ -1,0 +1,50 @@
+package me.mioclient.enum_;
+
+import java.util.function.Function;
+import me.mioclient.api.MinecraftAccess;
+import me.mioclient.internal.RotationManager;
+import net.minecraft.core.BlockPos;
+
+/** A horizontal (X/Z) direction incl. diagonals, mapping a distance to a BlockPos. */
+public enum HorizontalDirection implements MinecraftAccess {
+   XP(var0 -> BlockPos.containing(mc.player.getX() + (double)var0.intValue(), 0.0, 0.0)),
+   XN(var0 -> BlockPos.containing(mc.player.getX() - (double)var0.intValue(), 0.0, 0.0)),
+   ZP(var0 -> BlockPos.containing(0.0, 0.0, mc.player.getZ() + (double)var0.intValue())),
+   ZN(var0 -> BlockPos.containing(0.0, 0.0, mc.player.getZ() - (double)var0.intValue())),
+   XP_ZP(var0 -> BlockPos.containing((double)(method_401() + var0), 0.0, (double)(method_791() + var0))),
+   XN_ZP(var0 -> BlockPos.containing((double)(method_401() - var0), 0.0, (double)(method_791() + var0))),
+   XP_ZN(var0 -> BlockPos.containing((double)(method_401() + var0), 0.0, (double)(method_791() - var0))),
+   XN_ZN(var0 -> BlockPos.containing((double)(method_401() - var0), 0.0, (double)(method_791() - var0)));
+
+   public final Function<Integer, BlockPos> field_2740;
+
+    HorizontalDirection(Function<Integer, BlockPos> var3) {
+      this.field_2740 = var3;
+   }
+
+   public static int method_790() {
+      return (int)Math.max(Math.abs(mc.player.getX()), Math.abs(mc.player.getZ()));
+   }
+
+   public static int method_401() {
+      return (int)((double)method_790() * Math.signum(mc.player.getX()));
+   }
+
+   public static int method_791() {
+      return (int)((double)method_790() * Math.signum(mc.player.getZ()));
+   }
+
+   public static HorizontalDirection method_294(float var0) {
+      return switch (RotationManager.method_221(var0)) {
+         case 0 -> ZP;
+         case 1 -> XN_ZP;
+         case 2 -> XN;
+         case 3 -> XN_ZN;
+         case 4 -> ZN;
+         case 5 -> XP_ZN;
+         case 6 -> XP;
+         case 7 -> XP_ZP;
+         default -> null;
+      };
+   }
+}

@@ -1,0 +1,121 @@
+package me.mioclient.internal;
+
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.builder.RequiredArgumentBuilder;
+import java.awt.Desktop;
+import java.net.URL;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
+import me.mioclient.Hub;
+import me.mioclient.enum_.Priority;
+import me.mioclient.record.NameHistoryEntry;
+import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+
+public class Class_0343 extends ChatCommand {
+   public final String field_1143 = "https://api.mojang.com/users/profiles/minecraft/";
+   public final String field_1144 = "https://laby.net/api/user/%s/get-names";
+   public CompletableFuture<List<NameHistoryEntry>> field_1145;
+
+   public Class_0343() {
+      super("namehistory");   }
+
+   @Override
+   public void exec(LiteralArgumentBuilder<SharedSuggestionProvider> var1) {
+      var1.then(RequiredArgumentBuilder.<SharedSuggestionProvider, String>argument("name", new NameArgumentType()).executes(var1x -> {
+         if (this.field_1145 != null && !this.field_1145.isDone() && !this.field_1145.isCompletedExceptionally()) {
+            return 1;
+         } else {
+            String var2 = (String)var1x.getArgument("name", String.class);
+            this.field_1145 = this.method_84(var2);
+            this.field_1145.thenAccept(var1xx -> Hub.field_2619.method_2(() -> this.method_4((List<NameHistoryEntry>)var1xx), 0));
+            this.field_1145.exceptionally(var1xx -> {
+               Hub.field_2619.method_2(() -> this.method_2(var1xx), 0);
+               return null;
+            });
+            ChatUtil.method_2(Component.literal("Loading name history for ").append(this.method_5(var2)), ChatUtil.method_38(-3));
+            return 1;
+         }
+      }));
+      var1.then(
+         LiteralArgumentBuilder.<SharedSuggestionProvider>literal("open")
+            .then(
+               RequiredArgumentBuilder.<SharedSuggestionProvider, String>argument("name", new NameArgumentType())
+                  .executes(
+                     var0 -> {
+                        try {
+                           Desktop.getDesktop()
+                              .browse(
+                                 new URL(
+                                       new PlaceholderText().method_2((String)var0.getArgument("name", String.class)).method_9("https://namemc.com/profile/\u0001")
+                                    )
+                                    .toURI()
+                              );
+                        } catch (Throwable var2) {
+                        }
+
+                        return 1;
+                     }
+                  )
+            )
+      );
+   }
+
+   public CompletableFuture<List<NameHistoryEntry>> method_84(String var1) {
+      return CompletableFuture.supplyAsync(
+         () -> {
+            String var2 = HttpUtil.method_2(
+                  HttpUtil.method_92(new PlaceholderText().method_2((Object)var1).method_9("https://api.mojang.com/users/profiles/minecraft/\u0001")).build()
+               )
+               .body();
+            JsonElement var3 = JsonParser.parseString(var2);
+            if (var3.isJsonObject() && var3.getAsJsonObject().has("id")) {
+               String var4 = var3.getAsJsonObject().get("id").getAsString();
+               return this.method_294(HttpUtil.method_2(HttpUtil.method_92("https://laby.net/api/user/%s/get-names".formatted(var4)).build()).body());
+            } else {
+               throw new RuntimeException("Player not found");
+            }
+         },
+         THREAD_POOL
+      );
+   }
+
+   public List<NameHistoryEntry> method_294(String var1) {
+      JsonElement var2 = JsonParser.parseString(var1);
+      return !var2.isJsonArray()
+         ? null
+         : var2.getAsJsonArray().asList().stream().map(var0 -> (NameHistoryEntry)GSON.fromJson(var0, NameHistoryEntry.class)).collect(Collectors.toList());
+   }
+
+   public void method_4(List<NameHistoryEntry> var1) {
+      if (var1 != null) {
+         try {
+            MutableComponent var2 = Component.empty();
+            var2.append(this.method_5(((NameHistoryEntry)var1.get(var1.size() - 1)).getDisplayName()));
+            var2.append("'s Name History: \n");
+            StringBuilder var3 = new StringBuilder();
+
+            for (int var4 = 0; var4 < var1.size(); var4++) {
+               NameHistoryEntry var5 = (NameHistoryEntry)var1.get(var4);
+               var3.append("%d. %s (%s)".formatted(var4 + 1, var5.getDisplayName(), var5.getFormattedDate()));
+               if (var4 != var1.size() - 1) {
+                  var3.append('\n');
+               }
+            }
+
+            var2.append(var3.toString());
+            ChatUtil.method_2(var2, ChatUtil.method_38(-3));
+         } catch (Exception var6) {
+            var6.printStackTrace();
+         }
+      }
+   }
+
+   public void method_2(Throwable var1) {
+      ChatUtil.method_2(Component.literal(var1.getCause().getMessage()), ChatUtil.method_38(-3), Priority.HIGH);
+   }
+}

@@ -1,0 +1,40 @@
+package me.mioclient.setting;
+
+import com.google.gson.JsonElement;
+import com.google.gson.JsonPrimitive;
+import java.util.function.Predicate;
+import me.mioclient.api.Nameable;
+import me.mioclient.internal.EnumConverter;
+
+public final class CustomSetting<T extends Enum<T>> extends Setting<T> {
+   public final EnumConverter field_589 = new EnumConverter((Class<? extends Enum<?>>)this.getValue().getDeclaringClass());
+
+   public CustomSetting(String var1, T var2, Predicate<T> var3) {
+      super(var1, (T)var2, var3);
+      if (!Nameable.method_16(var2)) {
+         throw new IllegalArgumentException();
+      }
+   }
+
+   public CustomSetting(String var1, T var2) {
+      super(var1, (T)var2);
+      if (!Nameable.method_16(var2)) {
+         throw new IllegalArgumentException();
+      }
+   }
+
+   @Override
+   public void method_78(String var1) {
+      this.method_78((T)this.field_589.method_9(new JsonPrimitive(var1)));
+   }
+
+   @Override
+   public JsonElement toJson() {
+      return this.field_589.method_7(this.getValue());
+   }
+
+   @Override
+   public void fromJson(JsonElement var1) {
+      this.method_78((T)this.field_589.method_9(var1));
+   }
+}

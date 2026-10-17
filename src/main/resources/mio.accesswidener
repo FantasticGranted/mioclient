@@ -1,0 +1,46 @@
+accessWidener	v1	official
+
+# Private inner classes referenced by our mixins / modules.
+accessible	class	net/minecraft/client/particle/FireworkParticles$SparkParticle
+accessible	class	net/minecraft/world/level/chunk/PalettedContainer$Data
+accessible	field	net/minecraft/world/entity/WalkAnimationState	speed	F
+accessible	field	net/minecraft/world/entity/WalkAnimationState	position	F
+accessible	field	net/minecraft/world/entity/WalkAnimationState	speedOld	F
+accessible	field	net/minecraft/client/particle/Particle	lifetime	I
+accessible	field	net/minecraft/client/gui/components/ChatComponent	trimmedMessages	Ljava/util/List;
+accessible	method	net/minecraft/world/entity/Entity	collectColliders	(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/level/Level;Ljava/util/List;Lnet/minecraft/world/phys/AABB;)Ljava/util/List;
+accessible	method	net/minecraft/world/item/CrossbowItem	getShootingPower	(Lnet/minecraft/world/item/component/ChargedProjectiles;)F
+accessible	field	com/mojang/blaze3d/systems/RenderSystem	shaderLightDirections	Lcom/mojang/blaze3d/buffers/GpuBufferSlice;
+
+# DragonEntityModel internals used by Trails / Chams modules
+accessible	field	net/minecraft/client/renderer/entity/EnderDragonRenderer	model	Lnet/minecraft/client/model/monster/dragon/EnderDragonModel;
+accessible	field	net/minecraft/client/model/monster/dragon/EnderDragonModel	head	Lnet/minecraft/client/model/geom/ModelPart;
+accessible	field	net/minecraft/client/model/monster/dragon/EnderDragonModel	jaw	Lnet/minecraft/client/model/geom/ModelPart;
+accessible	field	net/minecraft/client/model/monster/dragon/EnderDragonModel	body	Lnet/minecraft/client/model/geom/ModelPart;
+accessible	field	net/minecraft/client/model/monster/dragon/EnderDragonModel	leftWing	Lnet/minecraft/client/model/geom/ModelPart;
+accessible	field	net/minecraft/client/model/monster/dragon/EnderDragonModel	rightWing	Lnet/minecraft/client/model/geom/ModelPart;
+accessible	field	net/minecraft/client/model/monster/dragon/EnderDragonModel	leftWingTip	Lnet/minecraft/client/model/geom/ModelPart;
+accessible	field	net/minecraft/client/model/monster/dragon/EnderDragonModel	rightWingTip	Lnet/minecraft/client/model/geom/ModelPart;
+accessible	field	net/minecraft/client/model/monster/dragon/EnderDragonModel	neckParts	[Lnet/minecraft/client/model/geom/ModelPart;
+accessible	field	net/minecraft/client/model/monster/dragon/EnderDragonModel	tailParts	[Lnet/minecraft/client/model/geom/ModelPart;
+
+# Inventory internals (selected slot / items / armor equipment)
+accessible	field	net/minecraft/world/entity/player/Inventory	selected	I
+accessible	field	net/minecraft/world/entity/player/Inventory	items	Lnet/minecraft/core/NonNullList;
+accessible	field	net/minecraft/world/entity/player/Inventory	equipment	Lnet/minecraft/world/entity/EntityEquipment;
+
+# ClientInput impulse vector (protected, written by movement modules)
+accessible	field	net/minecraft/client/player/ClientInput	moveVector	Lnet/minecraft/world/phys/Vec2;
+
+# Vanilla OSX key mapping flag
+accessible	field	net/minecraft/client/input/InputQuirks	ON_OSX	Z
+
+# Walk distance / bob state used by NoBob etc.
+accessible	field	net/minecraft/client/entity/ClientAvatarState	walkDist	F
+accessible	field	net/minecraft/client/entity/ClientAvatarState	walkDistO	F
+
+accessible	field	net/minecraft/network/Connection	channel	Lio/netty/channel/Channel;
+accessible	field	net/minecraft/client/model/geom/ModelPart	cubes	Ljava/util/List;
+accessible	field	net/minecraft/client/model/geom/ModelPart	children	Ljava/util/Map;
+accessible	field	net/minecraft/client/model/geom/ModelPart$Cube	polygons	[Lnet/minecraft/client/model/geom/ModelPart$Polygon;
+accessible method net/minecraft/client/gui/screens/Screen addRenderableWidget (Lnet/minecraft/client/gui/components/events/GuiEventListener;)Lnet/minecraft/client/gui/components/events/GuiEventListener;
